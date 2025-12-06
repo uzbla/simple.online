@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mening Birinchi Saytim</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Mening Birinchi Saytim</h1>
+    <nav>
+      <a href="#home">Bosh sahifa</a>
+      <a href="#about">Haqida</a>
+      <a href="#contact">Aloqa</a>
+    </nav>
+  </header>
+
+  <main id="home" class="container">
+    <section class="hero">
+      <h2>Xush kelibsiz!</h2>
+      <p>Bu — oddiy sayt misoli. Pastdagi tugmani bosing.</p>
+      <button id="helloBtn">Men bilan salomlash</button>
+    </section>
+
+    <section id="about" class="card">
+      <h3>Haqida</h3>
+      <p>Bu yerda sayt haqida qisqacha ma'lumot bo‘ladi.</p>
+    </section>
+
+    <section id="contact" class="card">
+      <h3>Aloqa</h3>
+      <form id="contactForm">
+        <label>
+          Ism:
+          <input type="text" name="name" required />
+        </label>
+        <label>
+          Xabar:
+          <textarea name="message" required></textarea>
+        </label>
+        <button type="submit">Yuborish</button>
+      </form>
+      <p id="formResult" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 Mening Saytim</p>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
