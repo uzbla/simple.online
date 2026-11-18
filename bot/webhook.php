@@ -30,10 +30,7 @@ try {
     $name = e($from['first_name'] ?? '');
     switch ($cmd) {
         case 'start':
-            if ((int)DB::val('SELECT COUNT(*) FROM subscriptions WHERE user_id=?', [$u['id']]) === 0 && (int)Settings::get('trial_days', '0') > 0) {
-                $plan = DB::one('SELECT id FROM subscription_plans WHERE code="monthly" AND deleted_at IS NULL');
-                if ($plan) Subs::grant((int)$u['id'], (int)$plan['id'], (int)Settings::get('trial_days'), 'trial', null, null, 'Ro‘yxatdan o‘tish sinovi', true);
-            }
+            Subs::trialIfNew((int)$u['id']);
             $reply("Salom, <b>$name</b>! 👋\n<b>INTIZOM OS</b> — Reach Your Summit.\nBoshlash uchun ilovani oching.", $app); break;
         case 'app': $reply('Ilovani ochish:', $app); break;
         case 'today': case 'tasks':

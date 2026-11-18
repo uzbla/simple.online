@@ -40,19 +40,20 @@ final class Jobs {
         slog('info', 'cron', 'weekly done');
     }
     static function monthly(): void { $r = Backup::create('scheduled'); slog($r['ok'] ? 'info' : 'error', 'cron', 'monthly backup ' . ($r['ok'] ? 'ok' : $r['error'])); }
+    static function habitStreak(int $id, int $mask, DateTime $today): int {
+        $logs = array_flip(array_column(DB::all('SELECT log_date FROM habit_logs WHERE habit_id=? AND log_date>=DATE_SUB(CURDATE(), INTERVAL 400 DAY)', [$id]), 'log_date'));
+        $s = 0; $d = clone $today; $first = true;
+        for ($i = 0; $i < 400; $i++, $d->modify('-1 day')) {
+            if (!($mask & (1 << ((int)$d->format('N') - 1)))) continue;
+            if (isset($logs[$d->format('Y-m-d')])) $s++; elseif ($first) { $first = false; continue; } else break;
+            $first = false;
+        }
+        return $s;
+    }
     /** Odat va umumiy streak (kunlar ketma-ketligi; rejalanmagan kunlar sinmaydi) */
     static function streaks(): void {
         $today = new DateTime('today', new DateTimeZone(Settings::get('timezone', 'Asia/Tashkent')));
-        foreach (DB::all('SELECT id, days_mask FROM habits WHERE status="active"') as $h) {
-            $logs = array_flip(array_column(DB::all('SELECT log_date FROM habit_logs WHERE habit_id=? AND log_date>=DATE_SUB(CURDATE(), INTERVAL 400 DAY)', [$h['id']]), 'log_date'));
-            $s = 0; $d = clone $today; $first = true;
-            for ($i = 0; $i < 400; $i++, $d->modify('-1 day')) {
-                if (!($h['days_mask'] & (1 << ((int)$d->format('N') - 1)))) continue;
-                if (isset($logs[$d->format('Y-m-d')])) $s++; elseif ($first) { $first = false; continue; } else break;
-                $first = false;
-            }
-            DB::exec('UPDATE habits SET streak=? WHERE id=?', [$s, $h['id']]);
-        }
+        foreach (DB::all('SELECT id, days_mask FROM habits WHERE status="active"') as $h) DB::exec('UPDATE habits SET streak=? WHERE id=?', [self::habitStreak((int)$h['id'], (int)$h['days_mask'], $today), $h['id']]);
         foreach (DB::all('SELECT DISTINCT user_id FROM user_activity WHERE day>=DATE_SUB(CURDATE(), INTERVAL 1 DAY)') as $r) {
             $days = array_flip(array_column(DB::all('SELECT day FROM user_activity WHERE user_id=? AND day>=DATE_SUB(CURDATE(), INTERVAL 400 DAY)', [$r['user_id']]), 'day'));
             $s = 0; $d = clone $today; if (!isset($days[$d->format('Y-m-d')])) $d->modify('-1 day');

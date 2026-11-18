@@ -10,6 +10,7 @@ return [
     'webhook_secret' => $e('INTIZOM_WEBHOOK_SECRET'),   // setWebhook secret_token
     'miniapp_url'    => $e('INTIZOM_MINIAPP_URL', 'https://app.yourdomain.com'),
   ],
+  'app' => ['origin' => $e('INTIZOM_APP_ORIGIN', ''), 'dev_login' => $e('INTIZOM_DEV_LOGIN', '0') === '1'],   // dev_login FAQAT lokal sinov uchun
   'payments' => ['webhook_secret' => $e('INTIZOM_PAY_SECRET')],   // HMAC-SHA256 kaliti
   'admin' => ['base_url' => $e('INTIZOM_ADMIN_URL', ''), 'force_https' => $e('INTIZOM_FORCE_HTTPS', '1') === '1',
               'ip_header' => $e('INTIZOM_IP_HEADER', '')],      // proxy orqasida: masalan HTTP_X_FORWARDED_FOR
