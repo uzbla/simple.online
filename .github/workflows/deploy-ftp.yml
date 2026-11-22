@@ -1,0 +1,42 @@
+# Qo‘lda ishga tushiriladigan FTP deploy. Maxfiy ma’lumotlar kodda emas, GitHub Secrets'da:
+#   FTP_SERVER, FTP_USER, FTP_PASS   (Settings → Secrets and variables → Actions)
+name: Deploy via FTP
+on:
+  workflow_dispatch:
+    inputs:
+      server_dir:
+        description: "Serverdagi papka (oxirida / bilan), masalan /public_html/"
+        required: true
+        default: "/"
+      dry_run:
+        description: "Faqat nimalar yuklanishini ko‘rsatish (yuklamaydi)"
+        type: boolean
+        default: true
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP sintaksis tekshiruvi
+        run: find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l > /dev/null
+      - uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          port: 21
+          protocol: ftp
+          server-dir: ${{ inputs.server_dir }}
+          dry-run: ${{ inputs.dry_run }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            config/config.php
+            storage/backups/**
+            storage/logs/**
+            public/uploads/**
+            README.md
+            *.txt
